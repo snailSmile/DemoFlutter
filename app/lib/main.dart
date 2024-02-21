@@ -180,6 +180,332 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: CupertinoTabScaffold(
+        tabBar: CupertinoTabBar(
+          items: [
+            BottomNavigationBarItem(
+              label: 'Tab21',
+              icon: Icon(Icons.home),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab22',
+              icon: Icon(Icons.search),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab23',
+              icon: Icon(Icons.notifications),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab24',
+              icon: Icon(Icons.mail),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab25',
+              icon: Icon(Icons.person),
+            ),
+          ],
+        ),
+        tabBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return CupertinoTabView(
+              builder: (BuildContext context) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text(widget.title),
+                    automaticallyImplyLeading: false, // 隐藏返回按钮
+                  ),
+                  body: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        const Text(
+                          'You have pushed the button this many times:',
+                        ),
+                        Text(
+                          '$_counter=====$index',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                      ],
+                    ),
+                  ),
+                  floatingActionButton: FloatingActionButton(
+                    onPressed: _incrementCounter,
+                    tooltip: 'Increment',
+                    child: const Icon(Icons.add),
+                  ),
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.endDocked,
+                  bottomNavigationBar: SizedBox(
+                    height: kBottomNavigationBarHeight + 88,
+                    // 底部导航栏高度 + FloatingActionButton高度
+                    // child: BottomAppBar(
+                    //   child: Row(
+                    //     children: <Widget>[
+                    //       IconButton(
+                    //         icon: Icon(Icons.menu),
+                    //         onPressed: () {},
+                    //       ),
+                    //       Spacer(),
+                    //       IconButton(
+                    //         icon: Icon(Icons.search),
+                    //         onPressed: () {},
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                  ),
+                );
+              },
+            );
+          } else if (index == 1) {
+            return CupertinoTabView(
+              builder: (BuildContext context) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text(widget.title),
+                    automaticallyImplyLeading: false, // 隐藏返回按钮
+                  ),
+                  body: MyDataTable(),
+                  // floatingActionButton: FloatingActionButton(
+                  //   onPressed: _incrementCounter,
+                  //   tooltip: 'Increment',
+                  //   child: const Icon(Icons.add),
+                  // ),
+                  // floatingActionButtonLocation:
+                  //     FloatingActionButtonLocation.centerDocked,
+                  // bottomNavigationBar: SizedBox(
+                  //   height: kBottomNavigationBarHeight +
+                  //       30, // 底部导航栏高度 + FloatingActionButton高度
+                  //   // child: BottomAppBar(
+                  //   //   child: Row(
+                  //   //     children: <Widget>[
+                  //   //       IconButton(
+                  //   //         icon: Icon(Icons.menu),
+                  //   //         onPressed: () {},
+                  //   //       ),
+                  //   //       Spacer(),
+                  //   //       IconButton(
+                  //   //         icon: Icon(Icons.search),
+                  //   //         onPressed: () {},
+                  //   //       ),
+                  //   //     ],
+                  //   //   ),
+                  //   // ),
+                  // ),
+                );
+              },
+            );
+          } else if (index == 2) {
+            return _buildTab2();
+          } else {
+            return Center(
+              child: Text('hahaha'),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildTab2() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Tab 2'),
+      ),
+      body: Center(
+        child: Text('Tab 2 Content'),
+      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     // 按钮点击事件
+      //   },
+      //   child: Icon(Icons.add_sharp),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+/*
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CupertinoTabScaffold(
+        tabBar: CupertinoTabBar(
+          items: [
+            BottomNavigationBarItem(
+              label: 'Tab1',
+              icon: Icon(Icons.home),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab2',
+              icon: Icon(Icons.search),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab3',
+              icon: Icon(Icons.notifications),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab4',
+              icon: Icon(Icons.mail),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab5',
+              icon: Icon(Icons.person),
+            ),
+          ],
+        ),
+        tabBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return CupertinoTabView(
+              builder: (BuildContext context) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text(widget.title),
+                    automaticallyImplyLeading: false, // 隐藏返回按钮
+                  ),
+                  body: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        const Text(
+                          'You have pushed the button this many times:',
+                        ),
+                        Text(
+                          '$_counter=====$index',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          } else if (index == 1) {
+            return CupertinoTabView(
+              builder: (BuildContext context) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text(widget.title),
+                    automaticallyImplyLeading: false, // 隐藏返回按钮
+                  ),
+                  body: MyDataTable(),
+                );
+              },
+            );
+          } else {
+            return Center(
+              child: Text('hahaha'),
+            );
+          }
+        },
+      ),
+      floatingActionButton: Align(
+        alignment: Alignment.bottomRight,
+        child: FloatingActionButton(
+          onPressed: _incrementCounter,
+          tooltip: 'Increment',
+          child: const Icon(Icons.add),
+        ),
+      ),
+    );
+  }
+*/
+/*
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CupertinoTabScaffold(
+        tabBar: CupertinoTabBar(
+          items: [
+            BottomNavigationBarItem(
+              label: 'Tab1',
+              icon: Icon(Icons.home),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab2',
+              icon: Icon(Icons.search),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab3',
+              icon: Icon(Icons.notifications),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab4',
+              icon: Icon(Icons.mail),
+            ),
+            BottomNavigationBarItem(
+              label: 'Tab5',
+              icon: Icon(Icons.person),
+            ),
+          ],
+        ),
+        tabBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return CupertinoTabView(
+              builder: (BuildContext context) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text(widget.title),
+                    automaticallyImplyLeading: false, // 隐藏返回按钮
+                  ),
+                  body: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        const Text(
+                          'You have pushed the button this many times:',
+                        ),
+                        Text(
+                          '$_counter=====$index',
+                          style: Theme.of(context).textTheme.headline6,
+                        ),
+                      ],
+                    ),
+                  ),
+                  floatingActionButton: FloatingActionButton(
+                    onPressed: _incrementCounter,
+                    tooltip: 'Increment',
+                    child: const Icon(Icons.add),
+                  ),
+                  floatingActionButtonLocation: FloatingActionButtonLocation
+                      .centerDocked, // 修改为 centerDocked
+                );
+              },
+            );
+          } else if (index == 1) {
+            return CupertinoTabView(
+              builder: (BuildContext context) {
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text(widget.title),
+                    automaticallyImplyLeading: false, // 隐藏返回按钮
+                  ),
+                  body: MyDataTable(),
+                  floatingActionButton: FloatingActionButton(
+                    onPressed: _incrementCounter,
+                    tooltip: 'Increment',
+                    child: const Icon(Icons.add),
+                  ),
+                  floatingActionButtonLocation: FloatingActionButtonLocation
+                      .centerDocked, // 修改为 centerDocked
+                );
+              },
+            );
+          } else {
+            return Center(
+              child: Text('hahaha'),
+            );
+          }
+        },
+      ),
+    );
+  }
+*/
+
+/*
+  @override
+  Widget build(BuildContext context) {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         items: [
@@ -233,10 +559,29 @@ class _MyHomePageState extends State<MyHomePage>
             },
           );
         } else if (index == 1) {
-          return ListView(
-            children: [
-              MyDataTable(),
-            ],
+          // return ListView(
+          //   children: [
+          //     MyDataTable(),
+          //   ],
+          // );
+          return CupertinoTabView(
+            builder: (BuildContext context) {
+              return Scaffold(
+                appBar: AppBar(
+                  title: Text(widget.title),
+                  automaticallyImplyLeading: false, // 隐藏返回按钮
+                ),
+                body: MyDataTable(),
+                floatingActionButton: Align(
+                  alignment: Alignment.topCenter,
+                  child: FloatingActionButton(
+                    onPressed: _incrementCounter,
+                    tooltip: 'Increment',
+                    child: const Icon(Icons.add),
+                  ),
+                ),
+              );
+            },
           );
         } else {
           return Center(
@@ -247,6 +592,7 @@ class _MyHomePageState extends State<MyHomePage>
       // You can add other properties here if needed
     );
   }
+*/
 }
 
 /*
