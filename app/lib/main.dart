@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:fxtp_app/my_data_table.dart';
+
 /*
 //这段代码估计有问题
 import 'package:flutter/material.dart';
@@ -183,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage>
     return Scaffold(
       body: CupertinoTabScaffold(
         tabBar: CupertinoTabBar(
-          items: [
+          items: const [
             BottomNavigationBarItem(
               label: 'Tab21',
               icon: Icon(Icons.home),
@@ -236,7 +238,7 @@ class _MyHomePageState extends State<MyHomePage>
                   ),
                   floatingActionButtonLocation:
                       FloatingActionButtonLocation.endDocked,
-                  bottomNavigationBar: SizedBox(
+                  bottomNavigationBar: const SizedBox(
                     height: kBottomNavigationBarHeight + 88,
                     // 底部导航栏高度 + FloatingActionButton高度
                     // child: BottomAppBar(
@@ -299,7 +301,7 @@ class _MyHomePageState extends State<MyHomePage>
           } else if (index == 2) {
             return _buildTab2();
           } else {
-            return Center(
+            return const Center(
               child: Text('hahaha'),
             );
           }
@@ -311,10 +313,25 @@ class _MyHomePageState extends State<MyHomePage>
   Widget _buildTab2() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tab 2'),
+        title: const Text('Tab 2'),
       ),
       body: Center(
-        child: Text('Tab 2 Content'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: TextField(
+                keyboardType: TextInputType.phone,
+                style: const TextStyle(fontSize: 20),
+                inputFormatters: [
+                  phoneInputFormatter(),
+                  LengthLimitingTextInputFormatter(13),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: () {
@@ -324,6 +341,49 @@ class _MyHomePageState extends State<MyHomePage>
       // ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
+  }
+
+  TextInputFormatter phoneInputFormatter() {
+    return TextInputFormatter.withFunction((oldValue, newValue) {
+      String text = newValue.text;
+      //获取光标左边的文本
+      final positionStr = (text.substring(0, newValue.selection.baseOffset))
+          .replaceAll(RegExp(r"\s+\b|\b\s"), "");
+      //计算格式化后的光标位置
+      int length = positionStr.length;
+      var position = 0;
+      if (length <= 3) {
+        position = length;
+      } else if (length <= 7) {
+        // 因为前面的字符串里面加了一个空格
+        position = length + 1;
+      } else if (length <= 11) {
+        // 因为前面的字符串里面加了两个空格
+        position = length + 2;
+      } else {
+        // 号码本身为 11 位数字，因多了两个空格，故为 13
+        position = 13;
+      }
+
+      //这里格式化整个输入文本
+      text = text.replaceAll(RegExp(r"\s+\b|\b\s"), "");
+      var string = "";
+      for (int i = 0; i < text.length; i++) {
+        // 这里第 4 位，与第 8 位，我们用空格填充
+        if (i == 3 || i == 7) {
+          if (text[i] != "+") {
+            string = string + "+";
+          }
+        }
+        string += text[i];
+      }
+
+      return TextEditingValue(
+        text: string,
+        selection: TextSelection.fromPosition(
+            TextPosition(offset: position, affinity: TextAffinity.upstream)),
+      );
+    });
   }
 
 /*
