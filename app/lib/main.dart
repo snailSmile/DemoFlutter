@@ -161,10 +161,15 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   int _counter = 0;
+  late List<String> items;
   late TabController _tabController;
   @override
   void initState() {
     super.initState();
+    items = List.generate(
+        10000,
+        (index) =>
+            'Item ${'a' * (index * 10)}'); // Generate strings with the same content but different length
     _tabController = TabController(length: 5, vsync: this);
   }
 
@@ -268,7 +273,33 @@ class _MyHomePageState extends State<MyHomePage>
                     title: Text(widget.title),
                     automaticallyImplyLeading: false, // 隐藏返回按钮
                   ),
-                  body: MyDataTable(),
+                  body: ListView.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                items[index],
+                                style: TextStyle(fontSize: 18.0),
+                                textAlign: TextAlign.left,
+                                maxLines: null,
+                              ),
+                            ),
+                          ),
+                          const Divider(
+                            color: Colors.green,
+                            indent: 16.0,
+                            endIndent: 16.0,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                   // floatingActionButton: FloatingActionButton(
                   //   onPressed: _incrementCounter,
                   //   tooltip: 'Increment',
@@ -322,6 +353,7 @@ class _MyHomePageState extends State<MyHomePage>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 40),
               child: TextField(
+                // maxLength: 13,
                 keyboardType: TextInputType.phone,
                 style: const TextStyle(fontSize: 20),
                 inputFormatters: [
@@ -364,20 +396,21 @@ class _MyHomePageState extends State<MyHomePage>
         // 号码本身为 11 位数字，因多了两个空格，故为 13
         position = 13;
       }
-
+      print('打印之前的数据========$text');
       //这里格式化整个输入文本
       text = text.replaceAll(RegExp(r"\s+\b|\b\s"), "");
+      print('打印之后的数据========$text');
       var string = "";
       for (int i = 0; i < text.length; i++) {
         // 这里第 4 位，与第 8 位，我们用空格填充
         if (i == 3 || i == 7) {
-          if (text[i] != "+") {
-            string = string + "+";
+          if (text[i] != " ") {
+            string = string + " ";
           }
         }
         string += text[i];
       }
-
+      print('打印之后的数据遍历数据========$string');
       return TextEditingValue(
         text: string,
         selection: TextSelection.fromPosition(
