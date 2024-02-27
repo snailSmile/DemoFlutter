@@ -3,9 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:fxtp_app/Component/BlueCell.dart';
+import 'package:fxtp_app/Component/RedCell.dart';
 import 'package:fxtp_app/my_data_table.dart';
 
-//测试代码不不不不不不不不不
 /*
 //这段代码估计有问题
 import 'package:flutter/material.dart';
@@ -164,18 +165,23 @@ class _MyHomePageState extends State<MyHomePage>
   int _counter = 0;
   late List<String> items;
   late TabController _tabController;
+  ScrollController _scrollController = ScrollController();
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
     items = List.generate(
-        10000,
+        10,
         (index) =>
             'Item ${'a' * (index * 10)}'); // Generate strings with the same content but different length
     _tabController = TabController(length: 5, vsync: this);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -184,6 +190,39 @@ class _MyHomePageState extends State<MyHomePage>
     setState(() {
       _counter++;
     });
+  }
+
+  Future<void> _loadMore() async {
+    // Simulate a delay for loading more data
+    await Future.delayed(Duration(seconds: 1));
+    setState(() {
+      // Append more items to the list
+      items.addAll(
+          List.generate(10, (index) => "More Item ${items.length + index}"));
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _refresh() async {
+    // Simulate a delay for refreshing data
+    await Future.delayed(Duration(seconds: 2));
+    setState(() {
+      // Replace items with new data
+      items = List.generate(20, (index) => "Refreshed Item $index");
+    });
+  }
+
+  void _onScroll() {
+    print(
+        "刷新ing：($_isLoading)======pixels:($_scrollController.position.pixels)=====max:($_scrollController.position.maxScrollExtent)");
+    if (!_isLoading &&
+        _scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200) {
+      setState(() {
+        _isLoading = true;
+      });
+      _loadMore();
+    }
   }
 
   @override
@@ -274,33 +313,28 @@ class _MyHomePageState extends State<MyHomePage>
                     title: Text(widget.title),
                     automaticallyImplyLeading: false, // 隐藏返回按钮
                   ),
-                  body: ListView.builder(
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Container(
-                              width: double.infinity,
+                  body: RefreshIndicator(
+                      onRefresh: _refresh,
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: items.length + (_isLoading ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index == items.length) {
+                            return const Padding(
                               padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                items[index],
-                                style: TextStyle(fontSize: 18.0),
-                                textAlign: TextAlign.left,
-                                maxLines: null,
+                              child: Center(
+                                child: CircularProgressIndicator(),
                               ),
-                            ),
-                          ),
-                          const Divider(
-                            color: Colors.green,
-                            indent: 16.0,
-                            endIndent: 16.0,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+                            );
+                          } else {
+                            if (index % 2 == 0) {
+                              return RedCell(text: items[index]);
+                            } else {
+                              return BlueCell(text: items[index]);
+                            }
+                          }
+                        },
+                      )),
                   // floatingActionButton: FloatingActionButton(
                   //   onPressed: _incrementCounter,
                   //   tooltip: 'Increment',
