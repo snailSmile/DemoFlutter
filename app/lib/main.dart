@@ -1,10 +1,14 @@
 // import 'dart:html';
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:fxtp_app/Component/BlueCell.dart';
-import 'package:fxtp_app/Component/RedCell.dart';
+import 'package:fxtp_app/cell/BlueCell.dart';
+import 'package:fxtp_app/cell/RedCell.dart';
+import 'package:fxtp_app/model/Album.dart';
 import 'package:fxtp_app/my_data_table.dart';
 
 /*
@@ -168,6 +172,9 @@ class _MyHomePageState extends State<MyHomePage>
   ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
 
+  //网络请求
+  late Future<List<BottomNavigationBarItem>> _bottomBarItemsFutures;
+
   @override
   void initState() {
     super.initState();
@@ -177,6 +184,46 @@ class _MyHomePageState extends State<MyHomePage>
             'Item ${'a' * (index * 10)}'); // Generate strings with the same content but different length
     _tabController = TabController(length: 5, vsync: this);
     _scrollController.addListener(_onScroll);
+
+    _bottomBarItemsFutures = fetchBottomBarItems('1'); //获取底部导航栏数据
+  }
+
+  Future<List<BottomNavigationBarItem>> fetchBottomBarItems(
+      String title) async {
+    var httpClient = HttpClient();
+    try {
+      httpClient.findProxy = (url) {
+        return "PROXY 21.163.79.153:8888";
+      };
+      var request = await httpClient
+          .postUrl(Uri.parse('https://jsonplaceholder.typicode.com/albums'));
+      request.headers.set('Content-Type', 'application/json; charset=UTF-8');
+      request.write(jsonEncode({'title': title}));
+      var response = await request.close();
+      var resposeBody = await response.transform(utf8.decoder).join();
+      if (response.statusCode == 200) {
+        print('啊啊啊啊啊=====${response.statusCode}');
+        final List<dynamic> data = json.decode(resposeBody);
+        return List<BottomNavigationBarItem>.from(data.map((e) {
+          return BottomNavigationBarItem(
+            icon: e['icon'],
+            label: e['Text'],
+          );
+        }));
+        /*
+        final album = Album.fromJson(jsonDecode(resposeBody));
+        return album;
+        */
+      } else {
+        throw Exception(
+            '啊啊啊啊啊aaa=====Failede to create ablum, status code :${response.statusCode}');
+      }
+    } catch (e) {
+      print('啊啊啊啊啊bbb=====error $e');
+      throw Exception('啊啊啊啊啊ccc=====Failed to create album: $e');
+    } finally {
+      httpClient.close();
+    }
   }
 
   @override
@@ -186,12 +233,14 @@ class _MyHomePageState extends State<MyHomePage>
     super.dispose();
   }
 
+  //增
   void _incrementCounter() {
     setState(() {
       _counter++;
     });
   }
 
+  //上拉加载更多
   Future<void> _loadMore() async {
     // Simulate a delay for loading more data
     await Future.delayed(Duration(seconds: 1));
@@ -203,6 +252,7 @@ class _MyHomePageState extends State<MyHomePage>
     });
   }
 
+  //刷新
   Future<void> _refresh() async {
     // Simulate a delay for refreshing data
     await Future.delayed(Duration(seconds: 2));
@@ -212,6 +262,7 @@ class _MyHomePageState extends State<MyHomePage>
     });
   }
 
+  //滚动监听
   void _onScroll() {
     print(
         "刷新ing：($_isLoading)======pixels:($_scrollController.position.pixels)=====max:($_scrollController.position.maxScrollExtent)");
@@ -225,6 +276,108 @@ class _MyHomePageState extends State<MyHomePage>
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: FutureBuilder<List<BottomNavigationBarItem>>(
+        future: _bottomBarItemsFutures,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('error:${snapshot.error}'),
+            );
+          } else {
+            return CupertinoTabScaffold(
+              tabBar: CupertinoTabBar(items: snapshot.data!),
+              tabBuilder: (context, index) {
+                if (index == 0) {
+                  return CupertinoTabView(
+                    builder: (BuildContext context) {
+                      return Scaffold(
+                        appBar: AppBar(
+                          title: Text(widget.title),
+                          automaticallyImplyLeading: false, // 隐藏返回按钮
+                        ),
+                        body: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              const Text(
+                                'You have pushed the button this many times:',
+                              ),
+                              Text(
+                                '$_counter=====$index',
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
+                            ],
+                          ),
+                        ),
+                        floatingActionButton: FloatingActionButton(
+                          onPressed: _incrementCounter,
+                          tooltip: 'Increment',
+                          child: const Icon(Icons.add),
+                        ),
+                        floatingActionButtonLocation:
+                            FloatingActionButtonLocation.endDocked,
+                        bottomNavigationBar: const SizedBox(
+                          height: kBottomNavigationBarHeight + 88,
+                        ),
+                      );
+                    },
+                  );
+                } else if (index == 1) {
+                  return CupertinoTabView(
+                    builder: (BuildContext context) {
+                      return Scaffold(
+                        appBar: AppBar(
+                          title: Text(widget.title),
+                          automaticallyImplyLeading: false, // 隐藏返回按钮
+                        ),
+                        body: RefreshIndicator(
+                            onRefresh: _refresh,
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              itemCount: items.length + (_isLoading ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index == items.length) {
+                                  return const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                } else {
+                                  if (index % 2 == 0) {
+                                    return RedCell(text: items[index]);
+                                  } else {
+                                    return BlueCell(text: items[index]);
+                                  }
+                                }
+                              },
+                            )),
+                      );
+                    },
+                  );
+                } else if (index == 2) {
+                  return _buildTab2();
+                } else {
+                  return const Center(
+                    child: Text('hahaha'),
+                  );
+                }
+              },
+            );
+          }
+        },
+      ),
+    );
+  }
+
+/*
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -375,7 +528,7 @@ class _MyHomePageState extends State<MyHomePage>
       ),
     );
   }
-
+*/
   Widget _buildTab2() {
     return Scaffold(
       appBar: AppBar(
