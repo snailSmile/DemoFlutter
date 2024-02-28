@@ -10,6 +10,7 @@ import 'package:fxtp_app/cell/BlueCell.dart';
 import 'package:fxtp_app/cell/RedCell.dart';
 import 'package:fxtp_app/model/Album.dart';
 import 'package:fxtp_app/my_data_table.dart';
+import 'package:fxtp_app/tool/color.dart';
 
 /*
 //这段代码估计有问题
@@ -172,6 +173,7 @@ class _MyHomePageState extends State<MyHomePage>
   ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
 
+  Color randomColor = generateRandomColor();
   //网络请求
   late Future<List<BottomNavigationBarItem>> _bottomBarItemsFutures;
 
@@ -193,7 +195,7 @@ class _MyHomePageState extends State<MyHomePage>
     var httpClient = HttpClient();
     try {
       httpClient.findProxy = (url) {
-        return "PROXY 21.163.79.153:8888";
+        return "PROXY 21.163.78.141:8888";
       };
       var request = await httpClient
           .postUrl(Uri.parse('https://jsonplaceholder.typicode.com/albums'));
@@ -206,8 +208,20 @@ class _MyHomePageState extends State<MyHomePage>
         final List<dynamic> data = json.decode(resposeBody);
         return List<BottomNavigationBarItem>.from(data.map((e) {
           return BottomNavigationBarItem(
-            icon: e['icon'],
-            label: e['Text'],
+            icon: Image.network(
+              e['icon'],
+              width: MediaQuery.of(context).size.width / 5.0,
+              height: MediaQuery.of(context).size.width / 5.0 -
+                  MediaQuery.of(context).padding.bottom,
+            ),
+            activeIcon: Image.network(
+              e['iconSelected'],
+              width: MediaQuery.of(context).size.width / 5.0,
+              height: MediaQuery.of(context).size.width / 5.0 -
+                  MediaQuery.of(context).padding.bottom,
+            ),
+            backgroundColor: randomColor,
+            // label: e['Text'],
           );
         }));
         /*
