@@ -10,6 +10,7 @@ import 'package:fxtp_app/cell/BlueCell.dart';
 import 'package:fxtp_app/cell/RedCell.dart';
 import 'package:fxtp_app/model/Album.dart';
 import 'package:fxtp_app/my_data_table.dart';
+import 'package:fxtp_app/tool/CustomBarView.dart';
 import 'package:fxtp_app/tool/color.dart';
 
 /*
@@ -151,7 +152,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'this is a text'),
     );
   }
 }
@@ -173,9 +174,12 @@ class _MyHomePageState extends State<MyHomePage>
   ScrollController _scrollController = ScrollController();
   bool _isLoading = false;
 
+  int _selectedIndex = 0;
+  late Widget _currentPage;
   Color randomColor = generateRandomColor();
   //网络请求
-  late Future<List<BottomNavigationBarItem>> _bottomBarItemsFutures;
+  // late Future<List<BottomNavigationBarItem>> _bottomBarItemsFutures;
+  late Future<List<CustomBarItem>> _bottomBarItemsFutures;
 
   @override
   void initState() {
@@ -186,12 +190,29 @@ class _MyHomePageState extends State<MyHomePage>
             'Item ${'a' * (index * 10)}'); // Generate strings with the same content but different length
     _tabController = TabController(length: 5, vsync: this);
     _scrollController.addListener(_onScroll);
-
     _bottomBarItemsFutures = fetchBottomBarItems('1'); //获取底部导航栏数据
+    //_
   }
 
-  Future<List<BottomNavigationBarItem>> fetchBottomBarItems(
-      String title) async {
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 0:
+        return _buildPage1(index);
+      case 1:
+        return _buildPage2(index);
+      case 2:
+        return _buildTab2();
+      case 3:
+        return _buildPage2(index);
+      default:
+        return const Center(
+          child: Text('hahaha'),
+        );
+    }
+  }
+
+  // Future<List<BottomNavigationBarItem>> fetchBottomBarItems(
+  Future<List<CustomBarItem>> fetchBottomBarItems(String title) async {
     var httpClient = HttpClient();
     try {
       httpClient.findProxy = (url) {
@@ -205,7 +226,27 @@ class _MyHomePageState extends State<MyHomePage>
       var resposeBody = await response.transform(utf8.decoder).join();
       if (response.statusCode == 200) {
         print('啊啊啊啊啊=====${response.statusCode}');
+        //数据处理
         final List<dynamic> data = json.decode(resposeBody);
+        //自定义类json转换
+        return List<CustomBarItem>.from(data.map((e) {
+          return CustomBarItem(
+            icon: Image.network(
+              e['icon'],
+              width: MediaQuery.of(context).size.width / 5.0,
+              height: MediaQuery.of(context).size.width / 5.0 -
+                  MediaQuery.of(context).padding.bottom,
+            ),
+            activeIcon: Image.network(
+              e['iconSelected'],
+              width: MediaQuery.of(context).size.width / 5.0,
+              height: MediaQuery.of(context).size.width / 5.0 -
+                  MediaQuery.of(context).padding.bottom,
+            ),
+            // label: e['Text'],
+          );
+          /*
+        //BottomNavigationBarItem数据转化
         return List<BottomNavigationBarItem>.from(data.map((e) {
           return BottomNavigationBarItem(
             icon: Image.network(
@@ -223,6 +264,7 @@ class _MyHomePageState extends State<MyHomePage>
             backgroundColor: randomColor,
             // label: e['Text'],
           );
+          */
         }));
         /*
         final album = Album.fromJson(jsonDecode(resposeBody));
@@ -290,6 +332,49 @@ class _MyHomePageState extends State<MyHomePage>
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    print("当前 _selectedIndex 的值是: $_selectedIndex");
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        automaticallyImplyLeading: false,
+      ),
+      body: _buildPage(_selectedIndex),
+      bottomNavigationBar: FutureBuilder<List<CustomBarItem>>(
+        future: _bottomBarItemsFutures,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            print("这是当前aaaaaa==========");
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            print("这是当前bbbbbb==========");
+            return Center(
+              child: Text('error:${snapshot.error}'),
+            );
+          } else {
+            print("这是当前cccccc==========$_selectedIndex");
+            return CustomBarView(
+              items: snapshot.data!,
+              currentIndex: _selectedIndex,
+              onTap: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                  _currentPage = _buildPage(index);
+                  print("这是当前qqqqqq==========$index======$_selectedIndex");
+                });
+              },
+            );
+          }
+        },
+      ),
+    );
+  }
+
+/*
+//CupertinoTabBariOS风格tabbar接口返回
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -390,8 +475,9 @@ class _MyHomePageState extends State<MyHomePage>
       ),
     );
   }
-
+*/
 /*
+//CupertinoTabBariOS风格tabbar使用
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -543,6 +629,78 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 */
+
+  Widget _buildPage2(int index) {
+    return CupertinoTabView(
+      builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+            automaticallyImplyLeading: false,
+          ),
+          body: RefreshIndicator(
+            onRefresh: _refresh,
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: items.length + (_isLoading ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == items.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                } else {
+                  if (index % 2 == 0) {
+                    return RedCell(text: items[index]);
+                  } else {
+                    return BlueCell(text: items[index]);
+                  }
+                }
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPage1(int index) {
+    return Scaffold(
+      body: CupertinoTabView(
+        builder: (BuildContext context) {
+          return Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text(
+                    'You have pushed the button this many times:',
+                  ),
+                  Text(
+                    '$_counter=====$index',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                ],
+              ),
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: _incrementCounter,
+              tooltip: 'Increment',
+              child: const Icon(Icons.add),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.endDocked,
+            bottomNavigationBar: const SizedBox(
+              height: kBottomNavigationBarHeight + 88,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildTab2() {
     return Scaffold(
       appBar: AppBar(
