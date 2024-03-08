@@ -6,12 +6,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:fxtp_app/cell/BlueCell.dart';
-import 'package:fxtp_app/cell/RedCell.dart';
+import 'package:fxtp_app/net/request.dart';
+import 'package:fxtp_app/view/cell/BlueCell.dart';
+import 'package:fxtp_app/view/cell/RedCell.dart';
 import 'package:fxtp_app/model/Album.dart';
 import 'package:fxtp_app/my_data_table.dart';
 import 'package:fxtp_app/tool/CustomBarView.dart';
 import 'package:fxtp_app/tool/color.dart';
+import 'package:fxtp_app/view/main/page2.dart';
+import 'package:fxtp_app/view/main/page3.dart';
+import 'package:fxtp_app/view/main/page5.dart';
 
 /*
 //这段代码估计有问题
@@ -199,53 +203,46 @@ class _MyHomePageState extends State<MyHomePage>
       case 0:
         return _buildPage1(index);
       case 1:
-        return _buildPage2(index);
+        return page2(
+            title: widget.title,
+            items: items,
+            isLoading: _isLoading,
+            refreshCallBack: _refresh,
+            scrollController: _scrollController);
       case 2:
         return _buildTab2();
       case 3:
-        return _buildPage2(index);
+        return page3();
       default:
-        return const Center(
-          child: Text('hahaha'),
-        );
+        return const page5();
     }
   }
 
   // Future<List<BottomNavigationBarItem>> fetchBottomBarItems(
   Future<List<CustomBarItem>> fetchBottomBarItems(String title) async {
-    var httpClient = HttpClient();
     try {
-      httpClient.findProxy = (url) {
-        return "PROXY 21.163.78.141:8888";
-      };
-      var request = await httpClient
-          .postUrl(Uri.parse('https://jsonplaceholder.typicode.com/albums'));
-      request.headers.set('Content-Type', 'application/json; charset=UTF-8');
-      request.write(jsonEncode({'title': title}));
-      var response = await request.close();
-      var resposeBody = await response.transform(utf8.decoder).join();
-      if (response.statusCode == 200) {
-        print('啊啊啊啊啊=====${response.statusCode}');
-        //数据处理
-        final List<dynamic> data = json.decode(resposeBody);
-        //自定义类json转换
-        return List<CustomBarItem>.from(data.map((e) {
-          return CustomBarItem(
-            icon: Image.network(
-              e['icon'],
-              width: MediaQuery.of(context).size.width / 5.0,
-              height: MediaQuery.of(context).size.width / 5.0 -
-                  MediaQuery.of(context).padding.bottom,
-            ),
-            activeIcon: Image.network(
-              e['iconSelected'],
-              width: MediaQuery.of(context).size.width / 5.0,
-              height: MediaQuery.of(context).size.width / 5.0 -
-                  MediaQuery.of(context).padding.bottom,
-            ),
-            // label: e['Text'],
-          );
-          /*
+      String responseBody = await fetchData(
+          'https://jsonplaceholder.typicode.com/albums', {'title': title});
+      //数据处理
+      final List<dynamic> data = json.decode(responseBody);
+      //自定义类json转换
+      return List<CustomBarItem>.from(data.map((e) {
+        return CustomBarItem(
+          icon: Image.network(
+            e['icon'],
+            width: MediaQuery.of(context).size.width / 5.0,
+            height: MediaQuery.of(context).size.width / 5.0 -
+                MediaQuery.of(context).padding.bottom,
+          ),
+          activeIcon: Image.network(
+            e['iconSelected'],
+            width: MediaQuery.of(context).size.width / 5.0,
+            height: MediaQuery.of(context).size.width / 5.0 -
+                MediaQuery.of(context).padding.bottom,
+          ),
+          // label: e['Text'],
+        );
+        /*
         //BottomNavigationBarItem数据转化
         return List<BottomNavigationBarItem>.from(data.map((e) {
           return BottomNavigationBarItem(
@@ -265,20 +262,14 @@ class _MyHomePageState extends State<MyHomePage>
             // label: e['Text'],
           );
           */
-        }));
-        /*
+      }));
+      /*
         final album = Album.fromJson(jsonDecode(resposeBody));
         return album;
         */
-      } else {
-        throw Exception(
-            '啊啊啊啊啊aaa=====Failede to create ablum, status code :${response.statusCode}');
-      }
     } catch (e) {
       print('啊啊啊啊啊bbb=====error $e');
       throw Exception('啊啊啊啊啊ccc=====Failed to create album: $e');
-    } finally {
-      httpClient.close();
     }
   }
 
@@ -629,42 +620,6 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 */
-
-  Widget _buildPage2(int index) {
-    return CupertinoTabView(
-      builder: (BuildContext context) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(widget.title),
-            automaticallyImplyLeading: false,
-          ),
-          body: RefreshIndicator(
-            onRefresh: _refresh,
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: items.length + (_isLoading ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == items.length) {
-                  return const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                } else {
-                  if (index % 2 == 0) {
-                    return RedCell(text: items[index]);
-                  } else {
-                    return BlueCell(text: items[index]);
-                  }
-                }
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   Widget _buildPage1(int index) {
     return Scaffold(
