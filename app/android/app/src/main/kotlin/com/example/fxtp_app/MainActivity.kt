@@ -1,4 +1,4 @@
-package com.example.fxtp_app
+package com.example.FXTP
 
 import io.flutter.embedding.android.FlutterActivity
 

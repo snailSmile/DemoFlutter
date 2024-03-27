@@ -1,6 +1,6 @@
 {
-    "name": "fxtp_app",
-    "short_name": "fxtp_app",
+    "name": "FXTP",
+    "short_name": "FXTP",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

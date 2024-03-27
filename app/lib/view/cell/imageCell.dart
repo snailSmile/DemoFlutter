@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class imageCell extends StatefulWidget {
   final int itemIndex;
 
-  imageCell({required this.itemIndex});
+  const imageCell({super.key, required this.itemIndex});
   @override
   State<imageCell> createState() => _imageCellState();
 }

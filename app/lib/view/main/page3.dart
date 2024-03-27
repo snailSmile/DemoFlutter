@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:fxtp_app/view/widget/loadMore.dart';
+import 'package:FXTP/net/request.dart';
+import 'package:FXTP/view/widget/loadMore.dart';
 
 class ItemWidget extends StatelessWidget {
   final String text;
   final int count;
   final Function() onTap;
-
-  ItemWidget({required this.text, required this.count, required this.onTap});
+  final String id;
+  const ItemWidget(
+      {super.key,
+      required this.text,
+      required this.count,
+      required this.onTap,
+      required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +20,10 @@ class ItemWidget extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => page3()),
+          MaterialPageRoute(
+              builder: (context) => page3(
+                    moduleId: id,
+                  )),
         );
       },
       child: ListTile(
@@ -29,6 +38,11 @@ class ItemWidget extends StatelessWidget {
 }
 
 class page3 extends StatefulWidget {
+  final String moduleId;
+  const page3({
+    super.key,
+    required this.moduleId,
+  });
   @override
   State<page3> createState() => _page3State();
 }
@@ -48,7 +62,20 @@ class _page3State extends State<page3> {
     _fetchData();
   }
 
-  void _fetchData() async {
+  void _fetchData() {
+    fetchData('https://jsonplaceholder.typicode.com/albums',
+        {'title': widget.moduleId}).then((value) {
+      print("aaaaaaaaa=====$value");
+    });
+
+    fetchData('https://jsonplaceholder.typicode.com/albums',
+        {'title': widget.moduleId}).then((data) {
+      // 在这里处理返回的数据
+      print("Data received: $data");
+    }).catchError((error) {
+      // 错误处理
+      print("Error fetching data: $error");
+    });
   }
 
   void _onScroll() {
@@ -68,6 +95,7 @@ class _page3State extends State<page3> {
 
   @override
   void dispose() {
+    print("page3======dispose========");
     _scrollController.dispose();
     super.dispose();
   }
@@ -76,7 +104,7 @@ class _page3State extends State<page3> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ListView Example'),
+        title: const Text('ListView Example'),
       ),
       body: ListView.builder(
         controller: _scrollController,
@@ -92,6 +120,7 @@ class _page3State extends State<page3> {
                   counts[index]++; // 点击时增加对应ItemWidget的数量
                 });
               },
+              id: widget.moduleId,
             );
           } else {
             return buildLoadMoreIndiactor();
@@ -103,9 +132,11 @@ class _page3State extends State<page3> {
 
   Future<void> _loadMoreData() async {
     await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      counts.addAll(List.generate(10, (index) => 0));
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        counts.addAll(List.generate(10, (index) => 0));
+        isLoading = false;
+      });
+    }
   }
 }

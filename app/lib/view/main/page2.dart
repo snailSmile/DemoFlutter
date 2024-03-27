@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fxtp_app/view/cell/RedCell.dart';
-import 'package:fxtp_app/view/cell/BlueCell.dart';
-import 'package:fxtp_app/view/cell/imageCell.dart';
-import 'package:fxtp_app/view/cell/imageTextCell.dart';
+import 'package:FXTP/view/cell/RedCell.dart';
+import 'package:FXTP/view/cell/BlueCell.dart';
+import 'package:FXTP/view/cell/imageCell.dart';
+import 'package:FXTP/view/cell/imageTextCell.dart';
 
 class page2 extends StatefulWidget {
   final String title;
@@ -11,12 +11,15 @@ class page2 extends StatefulWidget {
   final bool isLoading;
   final Future<void> Function() refreshCallBack;
   final ScrollController scrollController;
-  page2({
+  final String moduleId;
+  const page2({
+    super.key,
     required this.title,
     required this.items,
     required this.isLoading,
     required this.refreshCallBack,
     required this.scrollController,
+    required this.moduleId,
   });
 
   @override

@@ -2,7 +2,8 @@ import 'dart:math';
 
 //16位随机数
 String generateRandomString() {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  // const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
    final random = Random();
    final StringBuffer buffer = StringBuffer();
    for (var i = 0; i < 16; i++) {

@@ -1,6 +1,9 @@
 // import 'package:device_information/device_information.dart';
+
 import 'package:flutter/material.dart';
 import 'package:platform_device_id/platform_device_id.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 // class DeviceUUIDFetcher {
 //   static Future<String?> getDeviceUUID(BuildContext context) async {
@@ -15,7 +18,7 @@ import 'package:platform_device_id/platform_device_id.dart';
 //   }
 // }
 
-class DeviceInfo  {
+class DeviceInfo {
   // static Future<String> getPlatformVersion() async {
   //   try {
   //     return await DeviceInformation.platformVersion;
@@ -42,17 +45,78 @@ class DeviceInfo  {
   //     return '';
   //   }
   // }
+  static late String appInfo;
+  static late String deviceModel;
+  static late String systemVersion;
+  static String? scale;
 
   static Future<String> getDeviceUUID() async {
     try {
-      String deviceId = await PlatformDeviceId.getDeviceId ?? '' ;
-      return deviceId;  // 如果deviceId为null，则返回空字符串
+      String deviceId = await PlatformDeviceId.getDeviceId ?? '';
+      return deviceId; // 如果deviceId为null，则返回空字符串
     } catch (e) {
       print("Error getting device UUID: $e"); // 打印错误信息
       return ""; // 返回空字符串作为默认值
     }
   }
 
+  static Future<void> initAppInfo() async {
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+      String bundleExecutable = packageInfo.appName ?? packageInfo.packageName;
+      String bundleShortVersionString = packageInfo.version ?? packageInfo.buildNumber;
+      deviceModel  = androidInfo.model ?? 'Unknown';
+      systemVersion = androidInfo.version.release ?? 'Unknow';
+      appInfo = '$bundleExecutable/$bundleShortVersionString';
+    } catch (e) {
+      appInfo = 'Error: $e';
+    }
+  }
+
+  static void updateScale(BuildContext context) {
+    scale = MediaQuery.of(context).devicePixelRatio.toString();
+  }
+
+  static String getFullAppInfo() {
+    String scaleInfo = scale != null ? 'Scale/$scale' : '';
+    return '$appInfo ($deviceModel; Android $systemVersion;$scaleInfo)';
+  }
+/*
+  static Future<void> initAppInfo(BuildContext context) async {
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+      String bundleExecutable = packageInfo.appName ?? packageInfo.packageName;
+      String bundleShortVersionString =
+          packageInfo.version ?? packageInfo.buildNumber;
+      String model = androidInfo.model ?? 'Unknown';
+      String systemVersion = androidInfo.version.release ?? 'Unknown';
+      double scale = MediaQuery.of(context).devicePixelRatio;
+      appInfo =
+          '$bundleExecutable/$bundleShortVersionString ($model; Android $systemVersion; Scale/$scale)';
+    } catch (e) {
+      appInfo = 'Error: $e';
+    }
+  }
+  */
+
+
+  // Future<String> getAppInfo2(BuildContext context) async {
+  //   try {
+  //     PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  //     AndroidDeviceInfo androidInfo = await DeviceInfoPlugin().androidInfo;
+  //     String bundleExecutable = packageInfo.appName ?? packageInfo.packageName;
+  //     String bundleShortVersionString =
+  //         packageInfo.version ?? packageInfo.buildNumber;
+  //     String model = androidInfo.model ?? 'Unknown';
+  //     String systemVersion = androidInfo.version.release ?? 'Unknown';
+  //     double scale = MediaQuery.of(context).devicePixelRatio;
+  //     return '$bundleExecutable/$bundleShortVersionString ($model; Android $systemVersion; Scale/$scale)';
+  //   } catch (e) {
+  //     return 'Error: $e';
+  //   }
+  // }
 }
 
 /*

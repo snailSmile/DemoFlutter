@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:fxtp_app/net/request.dart';
+import 'package:FXTP/net/request.dart';
 
 class page5 extends StatefulWidget {
   const page5({super.key});
@@ -22,9 +22,9 @@ class _page5State extends State<page5> {
     try {
       String responseBody = await fetchData(
           'https://ecloudsit.tppension.cntaiping.com/fxtpplatform/position/anonymous/position/resourcePosition/findResourceByModuleId?language=zh-CN',
-          {"moduleId": "1706495663655194627"});
+          {"moduleId": "1673588446869737474"});
       //数据处理
-      final List<dynamic> data = json.decode(responseBody);
+      final Map<String, dynamic> data = json.decode(responseBody);
       print('数据返回$data');
     } catch (e) {
       print('Error fetching data: $e');

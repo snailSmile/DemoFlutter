@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class BlueCell extends StatefulWidget {
   final String text;
 
-  BlueCell({required this.text});
+  const BlueCell({super.key, required this.text});
 
   @override
   State<BlueCell> createState() => _BlueCellState();
@@ -26,11 +26,11 @@ class _BlueCellState extends State<BlueCell> {
           padding: const EdgeInsets.all(8.0),
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             color: Colors.blue,
             child: Text(
               widget.text,
-              style: TextStyle(fontSize: 18.0),
+              style: const TextStyle(fontSize: 18.0),
               textAlign: TextAlign.left,
               maxLines: null,
             ),

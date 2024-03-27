@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 // import 'package:auto_size_text/auto_size_text.dart';
 
 class MyDataTable extends StatefulWidget {
+  const MyDataTable({super.key});
+
   @override
   _MyDataTableState createState() => _MyDataTableState();
 }
@@ -26,7 +27,7 @@ class _MyDataTableState extends State<MyDataTable> {
           onRefresh: () async {
             print('Refreshing...'); // 添加打印语句
             // 模拟刷新操作
-            await Future.delayed(Duration(seconds: 1));
+            await Future.delayed(const Duration(seconds: 1));
             setState(() {}); // 刷新界面
             print('方法调用了');
           },
@@ -34,19 +35,19 @@ class _MyDataTableState extends State<MyDataTable> {
             child: Column(
               children: <Widget>[
                 const SizedBox(height: 20),
-                Center(
+                const Center(
                   child: Text('You have pushed the button this many times:'),
                 ),
                 Center(
                   child: Text(
                     '$_counter',
-                    style: Theme.of(context).textTheme.headline4,
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
                 ),
                 const SizedBox(height: 20),
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 10.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   // alignment: Alignment.center,
                   child: datatable(),
                 ),
@@ -92,7 +93,7 @@ class _MyDataTableState extends State<MyDataTable> {
             ),
             DataCell(
               Container(
-                constraints: BoxConstraints(
+                constraints: const BoxConstraints(
                   maxWidth: 200,
                 ),
                 child: Text(

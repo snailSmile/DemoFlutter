@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "fxtp_app" "\0"
+            VALUE "FileDescription", "FXTP" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "fxtp_app" "\0"
+            VALUE "InternalName", "FXTP" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "fxtp_app.exe" "\0"
-            VALUE "ProductName", "fxtp_app" "\0"
+            VALUE "OriginalFilename", "FXTP.exe" "\0"
+            VALUE "ProductName", "FXTP" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

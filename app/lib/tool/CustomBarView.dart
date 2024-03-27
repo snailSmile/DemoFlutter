@@ -4,11 +4,12 @@ class CustomBarItem {
   final Widget icon;
   final Widget? activeIcon;
   final String? label;
-
+  final String id;
   CustomBarItem({
     required this.icon,
     this.activeIcon,
     this.label,
+    required this.id,
   });
 }
 
@@ -17,7 +18,7 @@ class CustomBarView extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int>? onTap;
 
-  CustomBarView({
+  const CustomBarView({super.key, 
     required this.items,
     required this.currentIndex,
     this.onTap,
@@ -51,7 +52,7 @@ class _CustomBarViewState extends State<CustomBarView> {
         });
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -62,7 +63,7 @@ class _CustomBarViewState extends State<CustomBarView> {
                 style: TextStyle(
                   color: index == widget.currentIndex
                       ? Theme.of(context).primaryColor
-                      : Theme.of(context).textTheme.caption!.color,
+                      : Theme.of(context).textTheme.bodySmall!.color,
                 ),
               ),
           ],

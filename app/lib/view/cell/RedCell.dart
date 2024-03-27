@@ -4,7 +4,7 @@ class RedCell extends StatefulWidget {
   final String text;
   final int counter;
   final VoidCallback onPressed;
-  RedCell({required this.text, required this.counter, required this.onPressed});
+  const RedCell({super.key, required this.text, required this.counter, required this.onPressed});
 
   @override
   State<RedCell> createState() => _RedCellState();
@@ -31,11 +31,11 @@ class _RedCellState extends State<RedCell> {
             children: [
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   color: Colors.red,
                   child: Text(
                     widget.text,
-                    style: TextStyle(fontSize: 18.0),
+                    style: const TextStyle(fontSize: 18.0),
                     textAlign: TextAlign.left,
                     maxLines: null,
                   ),
